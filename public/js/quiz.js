@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const next  = document.getElementById('next-btn');
 
   btns.forEach(b => b.addEventListener('click', async e => {
+    b.classList.remove('btn-outline-primary');
+    b.classList.add('btn-primary');
     e.preventDefault();
 
     const fd = new FormData();
@@ -18,8 +20,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btns.forEach(x => x.disabled = true);
     next.classList.remove('d-none');
-
-    b.classList.remove('btn-outline-primary');
-    b.classList.add('btn-primary');
   }));
 });
