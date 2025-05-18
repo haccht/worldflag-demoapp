@@ -1,0 +1,22 @@
+<h2 class="mb-4 text-center">Guess which country?</h2>
+
+<div class="text-center mb-4">
+  <img src="/flags/<%= @question[:code] %>.png" class="img-fluid border rounded shadow" alt="flag">
+</div>
+
+<form id="answer-form" class="text-center">
+  <div class="row row-cols-2 %> g-3 mb-4">
+    <% @question[:choices].each do |opt| %>
+      <div class="col">
+        <button type="submit" name="guess" value="<%= opt %>" class="btn btn-outline-primary w-100 py-2 option-btn">
+          <%= country(opt).dig('name', 'common') %>
+        </button>
+      </div>
+    <% end %>
+  </div>
+
+  <p id="feedback" class="fw-bold"></p>
+  <a id="next-btn" class="btn btn-secondary mt-3 d-none" href="/quiz">Next</a>
+</form>
+
+<script defer src="/js/quiz.js"></script>

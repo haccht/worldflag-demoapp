@@ -1,0 +1,17 @@
+<div class="row mt-4 mb-5">
+  <div class="col-auto">
+    <input id="filter-input" type="search" placeholder="Filter by name" class="form-control form-control-lg" autocomplete="off">
+  </div>
+</div>
+
+<div id="country-grid" class="row row-cols-2 row-cols-sm-4 row-cols-md-6 g-3">
+  <% @countries.each do |c| %>
+    <% code = c['cca2'].downcase %>
+    <div class="col country-card" data-name="<%= c['name']['common'].downcase %>" data-code="<%= code.downcase %>">
+      <a href="/country/<%= code %>" class="text-decoration-none text-dark">
+        <img src="/flags/<%= code %>.png" alt="<%= c['name']['common'] %> flag" class="img-fluid border rounded-1" loading="lazy">
+        <div class="small mt-1"><%= c['name']['common'] %></div>
+      </a>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,44 @@
+<% @title = "#{@country['flag']}#{@country['name']['common']} - World Countries" %>
+
+<div class="row">
+  <div class="col-md-4 text-center mb-4">
+    <img src="/flags/<%= @country['cca2'].downcase %>_6000x4000.jpg"
+         alt="Flag"
+         class="img-fluid border rounded-1 shadow-sm">
+  </div>
+  <div class="col-md-8">
+    <h2>
+      <%= @country['name']['common'] %>
+      <small class="text-body-secondary"> - <%= @country['cca2'] %></small>
+    </h2>
+    <table class="table table-striped w-auto">
+      <tbody>
+        <tr><th>Official name</th><td><%= @country['name']['official'] %></td></tr>
+        <tr><th>Capital</th><td><%= @country['capital']&.first || "—" %></td></tr>
+        <tr><th>Continents</th><td><%= @country['continents']&.first || "—" %></td></tr>
+        <tr><th>Timezone</th><td><%= @country['timezones']&.join(', ')|| "—" %></td></tr>
+        <tr><th>Region</th><td><%= @country['region'] %> <small class="text-body-secondary">(<%= @country['subregion'] %>)</small></td></tr>
+        <tr><th>Population</th><td><%= format_n(@country['population']) %></td></tr>
+        <tr><th>Area (km²)</th><td><%= (format_n(@country['area']&.round) || "-") %></td></tr>
+        <tr><th>Languages</th><td><%= @country['languages']&.values&.join(', ') || "—" %></td></tr>
+        <tr><th>Currencies</th><td>
+          <% if @country['currencies'] %>
+            <%= @country['currencies'].map { |k,v| "#{v['symbol']} #{v['name']} (#{k})" }.join(', ') %>
+          <% else %>—<% end %>
+        </td></tr>
+      </tbody>
+    </table>
+
+    <div class="ratio ratio-16x9 my-4">
+      <iframe
+        src="<%= maps_embed_url(@country) %>"
+        loading="lazy"
+        style="border:0"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
+    <a href="/" class="btn btn-sm btn-secondary">Back</a>
+  </div>
+</div>

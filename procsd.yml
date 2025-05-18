@@ -1,0 +1,6 @@
+app: world-flags
+processes:
+  web: bundle exec puma -b tcp://127.0.0.1:4567 -w 4
+environment:
+  APP_ENV: production
+
