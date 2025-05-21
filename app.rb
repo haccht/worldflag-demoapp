@@ -25,7 +25,7 @@ class WorldApp < Sinatra::Base
   end
 
   configure :production do
-    set :host_authorization, { permitted_hosts: ["www.thachimu.net", "origin-2d36863-www.thachimu.net"] }
+    set :host_authorization, { permitted_hosts: ENV['AUTHORIZED_HOSTS'].split(",").map { |e| e.strip } }
   end
 
   helpers Sinatra::Cookies
