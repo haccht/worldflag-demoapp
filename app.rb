@@ -4,6 +4,7 @@ require 'sinatra/cookies'
 require 'sinatra/custom_logger'
 require 'dotenv/load'
 require 'faraday'
+require 'rack/brotli'
 require 'image_processing/mini_magick'
 require 'fileutils'
 require 'digest/sha1'
@@ -16,12 +17,41 @@ CACHE_COUNTRIES = 'cache/countries'
 CACHE_FLAGS     = 'cache/flags'
 FileUtils.mkdir_p([CACHE_COUNTRIES, CACHE_FLAGS])
 
+class DebugHeaderMiddleware
+  def initialize(app, logger:)
+    @app = app
+    @logger = logger
+  end
+
+  def call(env)
+    env.select { |k,_| k.start_with?('HTTP_') }.each do |k,v|
+      k = k.delete_prefix("HTTP_").gsub(/_/, '-').downcase
+      @logger.info "[req->] #{k}: #{v}"
+    end
+
+    status, headers, body = @app.call(env)
+    headers.each do |k,v|
+      @logger.info "[<-res] #{k}: #{v}"
+    end
+
+    [status, headers, body]
+  end
+end
+
 
 class WorldApp < Sinatra::Base
   configure :development, :production do
-    set :logger, Logger.new($stdout)
     set :static_cache_control, [:public, max_age: CACHE_TTL, immutable: true]
+    set :logger, Logger.new($stdout)
+    $stdout.sync = true
+
+    #use DebugHeaderMiddleware, logger: settings.logger
+    use Rack::CommonLogger, settings.logger
+
     use Rack::Session::Cookie, secret: ENV['SESSION_SECRET'] || SecureRandom.hex(64)
+
+    use Rack::Deflater
+    use Rack::Brotli
   end
 
   configure :production do
