@@ -17,7 +17,7 @@ CACHE_COUNTRIES = 'cache/countries'
 CACHE_FLAGS     = 'cache/flags'
 FileUtils.mkdir_p([CACHE_COUNTRIES, CACHE_FLAGS])
 
-class DebugHeaderMiddleware
+class DebugMiddleware
   def initialize(app, logger:)
     @app = app
     @logger = logger
@@ -39,15 +39,14 @@ class DebugHeaderMiddleware
 end
 
 
-class WorldApp < Sinatra::Base
+class WorldFlagApp < Sinatra::Base
   configure :development, :production do
     set :static_cache_control, [:public, max_age: CACHE_TTL, immutable: true]
     set :logger, Logger.new($stdout)
     $stdout.sync = true
 
-    #use DebugHeaderMiddleware, logger: settings.logger
+    #use DebugMiddleware, logger: settings.logger
     use Rack::CommonLogger, settings.logger
-
     use Rack::Session::Cookie, secret: ENV['SESSION_SECRET'] || SecureRandom.hex(64)
 
     use Rack::Deflater
@@ -94,7 +93,7 @@ class WorldApp < Sinatra::Base
       halt 502
     end
 
-    def flag_cache(base, ext)
+    def flag(base, ext)
       cache = File.join(CACHE_FLAGS, "#{base}.#{ext}")
       cache_miss = !File.exist?(cache) || File.mtime(cache) < Time.now - CACHE_TTL
       return cache unless cache_miss
@@ -107,7 +106,7 @@ class WorldApp < Sinatra::Base
         return cache
       end
 
-      png = flag_cache(code, 'png')
+      png = flag(code, 'png')
       pipeline = ImageProcessing::MiniMagick.source(png)
       pipeline = pipeline.resize_to_fit(w&.to_i, h&.to_i)
       pipeline = pipeline.convert(ext)
@@ -136,10 +135,6 @@ class WorldApp < Sinatra::Base
 
   get '/' do
     @countries = countries
-    if params[:q]&.strip&.length&.positive?
-      q = params[:q].downcase
-      @countries.select! { ['name', 'code'].any? { |e| c[e].downcase.include?(q) } }
-    end
     erb :index
   end
 
@@ -153,7 +148,7 @@ class WorldApp < Sinatra::Base
     halt 502 unless m
 
     base, ext = m.captures
-    filepath = flag_cache(base, ext)
+    filepath = flag(base, ext)
 
     case ext
     when 'jpg', 'jpeg'
