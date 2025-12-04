@@ -135,6 +135,7 @@ class WorldFlagApp < Sinatra::Base
 
   get '/' do
     @countries = countries
+
     erb :index
   end
 
