@@ -1,43 +1,69 @@
-<% @title = "#{@country['flag']}#{@country['name']['common']} - World Flags" %>
+<% @title = "#{@country.dig('flag', 'emoji')}#{@country.dig('names', 'common')} - World Flags" %>
+<% code = @country.dig('codes', 'alpha_2') %>
 
 <div class="row">
   <div class="col-md-4 text-center mb-4">
-    <img src="/flags/<%= @country['cca2'].downcase %>.png"
+    <img src="/flags/<%= code.downcase %>.png"
          alt="Flag"
          class="img-fluid border rounded-1 shadow-sm">
   </div>
   <div class="col-md-8">
     <h2>
-      <%= @country['name']['common'] %>
-      <small class="text-body-secondary"> - <%= @country['cca2'] %></small>
+      <%= @country.dig('names', 'common') %>
+      <small class="text-body-secondary"> - <%= code %></small>
     </h2>
     <table class="table table-striped w-auto">
       <tbody>
-        <tr><th>Official name</th><td><%= @country['name']['official'] %></td></tr>
-        <tr><th>Capital</th><td><%= @country['capital']&.first || "—" %></td></tr>
+        <tr><th>Official name</th><td><%= @country.dig('names', 'official') %></td></tr>
+        <% capitals = capital_names(@country) %>
+        <tr><th>Capital</th><td><%= capitals.any? ? capitals.join(', ') : "—" %></td></tr>
         <tr><th>Continents</th><td><%= @country['continents']&.first || "—" %></td></tr>
         <tr><th>Timezone</th><td><%= @country['timezones']&.join(', ')|| "—" %></td></tr>
         <tr><th>Region</th><td><%= @country['region'] %> <small class="text-body-secondary">(<%= @country['subregion'] %>)</small></td></tr>
-        <tr><th>Population</th><td><%= format_n(@country['population']) %></td></tr>
-        <tr><th>Area (km²)</th><td><%= (format_n(@country['area']&.round) || "-") %></td></tr>
-        <tr><th>Languages</th><td><%= @country['languages']&.values&.join(', ') || "—" %></td></tr>
+        <tr><th>Population</th><td><%= format_n(@country['population']) || "—" %></td></tr>
+        <tr><th>Area (km²)</th><td><%= (format_n(@country.dig('area', 'kilometers')&.round) || "-") %></td></tr>
+        <% if description = flag_description(@country) %>
+          <tr><th>Flag info</th><td><%= description %></td></tr>
+        <% end %>
+        <% palette = flag_palette(@country) %>
+        <% if palette.any? %>
+          <tr><th>Flag colors</th><td>
+            <div class="d-flex flex-wrap gap-2">
+              <% palette.each do |color| %>
+                <span class="d-inline-flex align-items-center gap-1 small">
+                  <span class="border rounded-1 d-inline-block"
+                        style="width: 1rem; height: 1rem; background-color: <%= color['hex'] %>"></span>
+                  <span><%= color['hex'] %></span>
+                  <% if color['proportion'] %>
+                    <span class="text-body-secondary">(<%= (color['proportion'].to_f * 100).round %>%)</span>
+                  <% end %>
+                </span>
+              <% end %>
+            </div>
+          </td></tr>
+        <% end %>
+        <% languages = language_names(@country) %>
+        <tr><th>Languages</th><td><%= languages.any? ? languages.join(', ') : "—" %></td></tr>
         <tr><th>Currencies</th><td>
-          <% if @country['currencies'] %>
-            <%= @country['currencies'].map { |k,v| "#{v['symbol']} #{v['name']} (#{k})" }.join(', ') %>
+          <% currencies = currency_names(@country) %>
+          <% if currencies.any? %>
+            <%= currencies.join(', ') %>
           <% else %>—<% end %>
         </td></tr>
       </tbody>
     </table>
 
-    <div class="ratio ratio-16x9 my-4">
-      <iframe
-        src="<%= maps_embed_url(@country) %>"
-        loading="lazy"
-        style="border:0"
-        allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </div>
+    <% if map_url = maps_embed_url(@country) %>
+      <div class="ratio ratio-16x9 my-4">
+        <iframe
+          src="<%= map_url %>"
+          loading="lazy"
+          style="border:0"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    <% end %>
 
     <a href="/" class="btn btn-sm btn-secondary">Back</a>
   </div>

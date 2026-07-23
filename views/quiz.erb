@@ -8,15 +8,14 @@
   <div class="row row-cols-2 %> g-3 mb-4">
     <% @question[:choices].each do |opt| %>
       <div class="col">
-        <button type="submit" name="guess" value="<%= opt %>" class="btn btn-outline-primary w-100 py-2 option-btn">
-          <%= country(opt).dig('name', 'common') %>
+        <button type="submit" name="guess" value="<%= opt[:code] %>" class="btn btn-outline-primary w-100 py-2 option-btn">
+          <%= opt[:name] %>
         </button>
       </div>
     <% end %>
   </div>
 
-  <p id="feedback" class="fw-bold"></p>
-  <a id="next-btn" class="btn btn-secondary mt-3 d-none" href="/quiz">Next</a>
-</form>
-
-<script defer src="/js/quiz.js"></script>
+	  <p id="feedback" class="fw-bold"></p>
+	  <a id="answer-link" class="btn btn-outline-success mt-3 d-none" href="#">Show answer</a>
+	  <a id="next-btn" class="btn btn-secondary mt-3 d-none" href="/quiz">Next</a>
+	</form>
