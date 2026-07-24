@@ -1,5 +1,9 @@
 <% @title = "#{@country.dig('flag', 'emoji')}#{@country.dig('names', 'common')} - World Flags" %>
 <% code = @country.dig('codes', 'alpha_2') %>
+<% capitals = capital_names(@country) %>
+<% palette = flag_palette(@country) %>
+<% languages = language_names(@country) %>
+<% currencies = currency_names(@country) %>
 
 <div class="row">
   <div class="col-md-4 text-center mb-4">
@@ -9,13 +13,12 @@
   </div>
   <div class="col-md-8">
     <h2>
-      <%= @country.dig('names', 'common') %>
+      <%= @country.dig('flag', 'emoji') %> <%= @country.dig('names', 'common') %>
       <small class="text-body-secondary"> - <%= code %></small>
     </h2>
     <table class="table table-striped w-auto">
       <tbody>
         <tr><th>Official name</th><td><%= @country.dig('names', 'official') %></td></tr>
-        <% capitals = capital_names(@country) %>
         <tr><th>Capital</th><td><%= capitals.any? ? capitals.join(', ') : "—" %></td></tr>
         <tr><th>Continents</th><td><%= @country['continents']&.first || "—" %></td></tr>
         <tr><th>Timezone</th><td><%= @country['timezones']&.join(', ')|| "—" %></td></tr>
@@ -25,7 +28,6 @@
         <% if description = flag_description(@country) %>
           <tr><th>Flag info</th><td><%= description %></td></tr>
         <% end %>
-        <% palette = flag_palette(@country) %>
         <% if palette.any? %>
           <tr><th>Flag colors</th><td>
             <div class="d-flex flex-wrap gap-2">
@@ -42,10 +44,8 @@
             </div>
           </td></tr>
         <% end %>
-        <% languages = language_names(@country) %>
         <tr><th>Languages</th><td><%= languages.any? ? languages.join(', ') : "—" %></td></tr>
         <tr><th>Currencies</th><td>
-          <% currencies = currency_names(@country) %>
           <% if currencies.any? %>
             <%= currencies.join(', ') %>
           <% else %>—<% end %>
